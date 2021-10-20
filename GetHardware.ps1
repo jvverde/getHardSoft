@@ -7,8 +7,8 @@ $TempFile = [System.IO.Path]::GetTempFileName()
 $result = "${output}.csv"
 $errors = "${output}.err"
 
-if (Test-Path -Path $output -PathType Leaf) {
-	Copy-Item $output -Destination $TempFile
+if (Test-Path -Path $result -PathType Leaf) {
+	Copy-Item $result -Destination $TempFile
 }
 
 Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, OperatingSystem,OperatingSystemVersion,Ipv4Address | 
