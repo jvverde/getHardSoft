@@ -1,1 +1,1 @@
-Enter-PSSession -ComputerName hppt-mgmt-01.pt.hp.local -Credential pt.hp.local\isidro.vilaverde
+Enter-PSSession -ComputerName server -Credential domain\user
