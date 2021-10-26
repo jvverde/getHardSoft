@@ -26,6 +26,7 @@ Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, Opera
 			New-Object -TypeName psobject -Property @{
 				ADName = $name
 				'00-Date' = Get-Date
+				'00-Origin' = $env:computername
 				'01-Name' = $CS.Name
 				'02-Manufacturer' = $CS.Manufacturer
 				'03-Model' = $CS.Model
@@ -64,4 +65,4 @@ Import-CSV -Path $TempFile| %{$myhash[$_."01-Name" + $_.ADName] = $_ }
 $myhash.values | Export-CSV $result
 
 Remove-Item $TempFile
-Write-host "The results are in '$result' and errors in '$errors'"
+Write-host "The results are in '$(Get-Item "$result")' and errors in '$(Get-Item "$errors")'"
