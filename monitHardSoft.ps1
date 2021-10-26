@@ -14,6 +14,10 @@ $oldlocation = Get-Location
 try{
 	if (!(Test-Path -Path $location)) {
 		New-Item -Path $location -ItemType "directory" -ea Stop
+		$acl = Get-Acl "$location"
+		$account = New-Object System.Security.Principal.Ntaccount("$env:UserDomain\$env:UserName")
+		$acl.SetOwner($account)
+		$acl| Set-Acl "$location"
 	}
 
 	Set-Location "$location"
