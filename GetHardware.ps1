@@ -62,7 +62,7 @@ Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, Opera
 # Remove duplicate lines from csv file
 $myhash = @{}
 Import-CSV -Path $TempFile| %{$myhash[$_."01-Name" + $_.ADName] = $_ }
-$myhash.values | Export-CSV $result
+$myhash.values | Export-CSV "$result"
 
 Remove-Item $TempFile
 Write-host "The results are in '$(Get-Item "$result")' and errors in '$(Get-Item "$errors")'"
