@@ -55,6 +55,7 @@ Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, Opera
 				Computer = $name
 				date = Get-Date
 				error = $_
+				'00-Origin' = $env:computername
 			} | Export-CSV "$errors" -Append
 		}
 	}
