@@ -25,7 +25,12 @@ try{
 	for(;;) {
 		foreach ($p in $pairs) {
 			$name, $filter = $p.split('=')
-			& "${PSScriptRoot}\GetHardware.ps1" "$name" "$filter"
+			try {
+				& "${PSScriptRoot}\GetHardware.ps1" "$name" "$filter"
+			}
+			catch {
+				Write-Warning "Error running GetHardware.ps1 $_"		
+			}
 		}
 		Start-Sleep $sleep
 	}

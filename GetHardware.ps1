@@ -7,9 +7,10 @@ $TempFile = [System.IO.Path]::GetTempFileName()
 $result = "${output}.csv"
 $errors = "${output}.err"
 
-if (Test-Path -Path $result -PathType Leaf) {
-	Copy-Item $result -Destination $TempFile
+if (Test-Path -Path "$result" -PathType Leaf) {
+	Copy-Item "$result" -Destination $TempFile
 }
+
 
 Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, OperatingSystem,OperatingSystemVersion,Ipv4Address | 
 	where {
@@ -51,18 +52,34 @@ Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, Opera
 			} | Export-CSV $TempFile -Append
 		} catch {
 			Write-host "Not possible to get values from ${name}: $_"
-			New-Object -TypeName psobject -Property @{
-				Computer = $name
-				date = Get-Date
-				error = $_
-				'00-Origin' = $env:computername
-			} | Export-CSV "$errors" -Append
-		}
+			try {
+				$ip = (Resolve-DnsName -Name $name).IPAddress
+				$resolve = (Resolve-DnsName -Name $ip).NameHost
+				New-Object -TypeName psobject -Property @{
+					'01-Computer' = $name
+					'00-Date' = Get-Date
+					error = $_
+					'00-Origin' = $env:computername
+					'02-Ip' = $ip
+					'03-Resolve' = $resolve
+				} | %{
+					$obj = New-Object psobject
+					$_.psobject.properties | Sort Name | %{Add-Member -Inp $obj NoteProperty $_.Name $_.Value}
+					$obj
+				} | Export-CSV "$errors" -Append
+			} catch {
+				Write-Warning "$_"
+			}
+		} 
 	}
 	
 # Remove duplicate lines from csv file
 $myhash = @{}
-Import-CSV -Path $TempFile| %{$myhash[$_."01-Name" + $_.ADName] = $_ }
+Import-CSV -Path $TempFile| %{
+	if ($_."01-Name" -ne $null) {
+		$myhash[$_."01-Name"] = $_
+	}
+}
 $myhash.values | Export-CSV "$result"
 
 Remove-Item $TempFile
