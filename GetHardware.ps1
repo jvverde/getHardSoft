@@ -7,11 +7,6 @@ $TempFile = [System.IO.Path]::GetTempFileName()
 $result = "${output}.csv"
 $errors = "${output}.err"
 
-if (Test-Path -Path "$result" -PathType Leaf) {
-	Copy-Item "$result" -Destination $TempFile
-}
-
-
 Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, OperatingSystem,OperatingSystemVersion,Ipv4Address | 
 	where {
 		(Test-Connection $_.Name -Count 1 -ea SilentlyContinue)
@@ -34,6 +29,7 @@ Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, Opera
 				'04-Memory(Mb)' = $CS.TotalPhysicalMemory / 1MB -as [int]
 				'05-CPU' = $PROC.name
 				'06-OperatingSystem' = $_.OperatingSystem
+				'07-LastUser' = $CS.UserName
 				'CPU Caption' = $PROC.Caption
 				'CPU Manufacturer' = $PROC.Manufacturer
 				'CPU Speed (Mhz)' = $PROC.MaxClockSpeed
@@ -75,12 +71,23 @@ Get-ADComputer -Filter "Name -like '$filter'" -properties * | select Name, Opera
 	
 # Remove duplicate lines from csv file
 $myhash = @{}
+
+if (Test-Path -Path "$result" -PathType Leaf) {
+	#First import previous results if any
+	Import-CSV -Path $result| %{
+		if ($_."01-Name" -ne $null) {
+			$myhash[$_."01-Name"] = $_
+		}
+	}
+}
+
 Import-CSV -Path $TempFile| %{
 	if ($_."01-Name" -ne $null) {
 		$myhash[$_."01-Name"] = $_
 	}
 }
-$myhash.values | Export-CSV "$result"
+
+$myhash.values | Sort  -Descending '00-Date'| Export-CSV "$result"
 
 Remove-Item $TempFile
 Write-host "The results are in '$(Get-Item "$result")' and errors in '$(Get-Item "$errors")'"
