@@ -83,6 +83,11 @@ if (Test-Path -Path "$result" -PathType Leaf) {
 
 Import-CSV -Path $TempFile| %{
 	if ($_."01-Name" -ne $null) {
+		$old = $myhash[$_."01-Name"]
+		if ([string]::IsNullOrEmpty($_."07-LastUser") -and $old) {
+			# preserve info of last logged user 
+			$_."07-LastUser" = $old."07-LastUser"
+		}
 		$myhash[$_."01-Name"] = $_
 	}
 }
