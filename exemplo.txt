@@ -1,0 +1,1 @@
+.\monitHardSoft.ps1 bra=pt-cbra-*, boa=pt-cboa-*, coi=pt-ccoi-*, arr=pt-carr-*, gaia=pt-cgai-*, porto=pt-cpor-* -location \\pt-cbra-dcs-02\d$\serprest\scripts\data -sleep 1800
