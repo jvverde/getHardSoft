@@ -1,12 +1,12 @@
 Param(
-     [Parameter(Mandatory=$True, Position=0)]
-     $pairs = $(throw "Please enter name and filter as a pair. Ex: boa, pt-cboa-*"),
+  [Parameter(Mandatory=$True, Position=0)]
+  $pairs = $(throw "Please enter name and filter as a pair. Ex: boa, pt-cboa-*"),
      
-	 [Parameter(Mandatory=$False, Position=1)]
-	 $location=(Get-Location),
+	[Parameter(Mandatory=$False, Position=1)]
+	$location=(Get-Location),
 	 
-     [Parameter(Mandatory=$False, Position=2)]
-	 [int]$sleep=300
+  [Parameter(Mandatory=$False, Position=2)]
+	[int]$sleep=300
  )
 
 $oldlocation = Get-Location
